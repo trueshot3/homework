@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+  <title>CHEAPER PLAN</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="./css/index.css">
+  <link rel="shortcut icon" href="./img/favicon.ico" type="image/x-icon">
+</head>
+
+<body>
+  <div id="insert"></div>
+
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+  <script type="text/babel">
+    const shirtRed = 'img/red.png';
+    const shirtOrange = 'img/orange.png';
+    const shirtYellow = 'img/yellow.png';
+    const jsonLocalStorage = {
+      setItem: (key, value) => {
+        localStorage.setItem(key, JSON.stringify(value));
+      },
+      getItem: (key) => {
+        return JSON.parse(localStorage.getItem(key));
+      }
+    };
+
+    const Title = (props) => {
+      return <h1 id="title">{props.children}</h1>
+    };
+
+    const Select = ({ handleSelect }) => {
+      return (
+        <select name="select" class="ctrl" onChange={handleSelect}>
+          <option value={shirtRed}>Red</option>
+          <option value={shirtOrange}>Orange</option>
+          <option value={shirtYellow}>Yellow</option>
+        </select>
+      );
+    };
+
+    const Add = ({ handleAddClick }) => {
+      return <button class="ctrl" onClick={handleAddClick}>추가</button>
+    };
+
+    const Reset = ({ handleResetClick }) => {
+      return <button class="ctrl" onClick={handleResetClick}>초기화</button>
+    }
+
+    const Item = ({ src, handleDelete }) => {
+      return (
+        <li className="item">
+          <img src={src} alt="상품" />
+        </li>
+      );
+    };
+
+    const ItemList = ({ itemList, handleDelete }) => {
+      return (
+        <ul id="itemList">
+          {itemList.map((color, index) => <Item src={color} key={index} />)}
+        </ul>
+      );
+    };
+
+    const App = () => {
+      const [mainColor, setMainColor] = React.useState(shirtRed);
+      const [itemList, setItemList] = React.useState(() => {
+        return jsonLocalStorage.getItem('itemList') || [];
+      });
+
+      function handleSelect(event) {
+        setMainColor(event.target.value);
+      }
+
+      function handleAddClick(event) {
+        setItemList((pre) => {
+          const nextItem = [...pre, mainColor];
+          jsonLocalStorage.setItem('itemList', nextItem);
+          return nextItem;
+        });
+      }
+
+      function handleResetClick(event) {
+        window.localStorage.clear();
+        location.reload();
+      }
+
+      return (
+        <div>
+          <Title>CHEAPER PLAN</ Title>
+          <Select handleSelect={handleSelect} />
+          <Add handleAddClick={handleAddClick} />
+          <Reset handleResetClick={handleResetClick} />
+          <hr />
+          <ItemList itemList={itemList} />
+        </div>
+      );
+    };
+
+    const insert = document.querySelector('#insert');
+    ReactDOM.createRoot(insert).render(<App />);
+  </script>
+</body>
+
+</html>
